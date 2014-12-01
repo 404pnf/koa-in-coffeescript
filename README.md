@@ -31,4 +31,4 @@ Because app.use expects generator function only.  We have to fake one with yield
 
     app.listen 3000, console.log "on port 3000"
 
-```
+    ```
