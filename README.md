@@ -32,3 +32,24 @@ app.use (n) ->
 app.listen 3000, console.log "on port 3000"
 
 ```
+
+# yield in coffeescript
+
+``` coffeescript
+
+gen = do -> yield i for i in [1..3]
+# => {}
+gen.next()
+# => { value: 1, done: false }
+gen.next()
+# => { value: 2, done: false }
+# => gen.next()
+{ value: 3, done: false }
+# => gen.next()
+{ value: [ undefined, undefined, undefined ], done: true }
+# => gen.next()
+{ value: undefined, done: true }
+gen.next()
+# => { value: undefined, done: true }
+
+```
