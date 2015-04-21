@@ -2,9 +2,8 @@
 # Requirements
 
 1. install latest node with n
-1. install latest coffeescript, currently 1.8.0
-1. alias coffee with node --harmony in ~/.bash_profile
-        alias coffee='node --harmony /usr/local/bin/coffee'
+1. install latest coffeescript, currently 1.9.2
+1. coffee --nodejs --harmony app.coffee
 
 # Example
 
@@ -12,24 +11,33 @@ Because app.use expects generator function only.  We have to fake one with yield
 
 ``` coffeescript
 
+'use strict'
+
 koa = require 'koa'
 app = koa()
+note = console.log
 
-app.use (next) ->
-  start = new Date
-  yield next
-  ms = new Date - start
-  console.log '%s %s - %s', this.method, this.url, ms
+time_logger = (next) ->
+    start = Date.now()
+    yield next
+    note "耗时： #{Date.now() - start} 毫秒"
 
-# ## Use an unreachable yield
-# Because app.use expects generator function only.
-# We have to fake one with yield even though that doesn't make much sense.
-app.use (n) ->
-  this.body = 'Hello World' # return content to client
-  yield n # won't reach here
+method_logger = (next) ->
+    yield next
+    note "#{@method}: #{@url}"
 
+slow_logger = (next) ->
+    yield next
+    # post something to a log server far far away
+    # note ""
 
-app.listen 3000, console.log "on port 3000"
+app.use time_logger
+app.use method_logger
+
+app.use ->
+  yield return this.body = 'Hello from coffeescript on koa.'
+
+app.listen 3000, note "at port 3000"
 
 ```
 
