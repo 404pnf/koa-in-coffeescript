@@ -1,17 +1,27 @@
+'use strict'
 
 koa = require 'koa'
 app = koa()
+note = console.log
 
-app.use (next) ->
-  start = new Date
-  yield next
-  ms = new Date - start
-  console.log '%s %s - %s', this.method, this.url, ms
+time_logger = (next) ->
+    start = Date.now()
+    yield next
+    note "耗时： #{Date.now() - start} 毫秒"
 
+method_logger = (next) ->
+    yield next
+    note "#{@method}: #{@url}"
 
-app.use (n) ->
-  this.body = 'Hello World' # retruned content to client
-  yield n # won't reach here
+slow_logger = (next) ->
+    yield next
+    # post something to a log server far far away
+    # note ""
 
+app.use time_logger
+app.use method_logger
 
-app.listen 3000, console.log "on port 3000"
+app.use ->
+  yield return this.body = 'Hello from coffeescript on koa.'
+
+app.listen 3000, note "at port 3000"
